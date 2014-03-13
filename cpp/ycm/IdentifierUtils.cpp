@@ -30,25 +30,25 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-const char *const COMMENT_AND_STRING_REGEX =
-  "//.*?$" // Anything following '//'
-  "|"
-  "#.*?$"  // Anything following '#'
-  "|"
-  "/\\*.*?\\*/"  // C-style comments, '/* ... */'
-  "|"
-  // Anything inside single quotes, '...', but mind:
-  //  1. that the starting single quote is not escaped
-  //  2. the escaped slash (\\)
-  //  3. the escaped single quote inside the string
-  // "(?<!\\\\)'(?:\\\\\\\\|\\\\'|.)*?'"
-  "(?<!\\\\)'(?:\\\\\\\\|\\\\'|.)*?'"
-  "|"
-  // Anything inside double quotes, "...", but mind:
-  //  1. that the starting double quote is not escaped
-  //  2. the escaped slash (\\)
-  //  3. the escaped double quote inside the string
-  "(?<!\\\\)\"(?:\\\\\\\\|\\\\\"|.)*?\"";
+// const char *const COMMENT_AND_STRING_REGEX =
+//   "//.*?$" // Anything following '//'
+//   "|"
+//   "#.*?$"  // Anything following '#'
+//   "|"
+//   "/\\*.*?\\*/"  // C-style comments, '/* ... */'
+//   "|"
+//   // Anything inside single quotes, '...', but mind:
+//   //  1. that the starting single quote is not escaped
+//   //  2. the escaped slash (\\)
+//   //  3. the escaped single quote inside the string
+//   // "(?<!\\\\)'(?:\\\\\\\\|\\\\'|.)*?'"
+//   "(?<!\\\\)'(?:\\\\\\\\|\\\\'|.)*?'"
+//   "|"
+//   // Anything inside double quotes, "...", but mind:
+//   //  1. that the starting double quote is not escaped
+//   //  2. the escaped slash (\\)
+//   //  3. the escaped double quote inside the string
+//   "(?<!\\\\)\"(?:\\\\\\\\|\\\\\"|.)*?\"";
 
 const char *const IDENTIFIER_REGEX = "[_a-zA-Z]\\w*";
 
@@ -133,7 +133,7 @@ const char *const NOT_FOUND = "YCMFOOBAR_NOT_FOUND";
 
 
 std::string RemoveIdentifierFreeText( std::string text ) {
-  boost::erase_all_regex( text, boost::regex( COMMENT_AND_STRING_REGEX ) );
+  // boost::erase_all_regex( text, boost::regex( COMMENT_AND_STRING_REGEX ) );
   return text;
 }
 
