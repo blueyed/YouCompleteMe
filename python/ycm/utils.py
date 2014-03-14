@@ -33,7 +33,7 @@ WIN_PYTHON26_PATH = 'C:\python26\pythonw.exe'
 
 def IsIdentifierChar( char ):
   # return char.isalnum() or char == '_'
-  return char.isalnum() or char == '_' or char == '-'
+  return char.isalnum() or char in ['_', '-', '$']
 
 
 def SanitizeQuery( query ):
