@@ -1,6 +1,22 @@
 YouCompleteMe: a code-completion engine for Vim
 ===============================================
 
+
+# About this fork
+
+This is a fork of [https://github.com/Valloric/YouCompleteMe](YouCompleteMe),
+with the following notable changes:
+
+- Do not replace signs from other Vim plugins
+  (https://github.com/Valloric/YouCompleteMe/issues/812,
+  https://github.com/Valloric/YouCompleteMe/issues/887)
+- Match additional chars in indentifiers (`-`, `_` and `$`)
+  (https://github.com/Valloric/YouCompleteMe/issues/109)
+- Consider identifiers from strings and comments
+  (https://github.com/Valloric/YouCompleteMe/issues/98)
+
+# Original documentation
+
 [![Build Status](https://travis-ci.org/Valloric/YouCompleteMe.png?branch=travis)](https://travis-ci.org/Valloric/YouCompleteMe)
 
 YouCompleteMe is a fast, as-you-type, fuzzy-search code completion engine for
