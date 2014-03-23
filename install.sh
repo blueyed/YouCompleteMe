@@ -41,8 +41,8 @@ function python_finder {
     lib_python="${python_prefix}/lib/lib${which_python}"
     if [ -f "${lib_python}.a" ]; then
       python_library+="${lib_python}.a"
+    # This check is for for CYGWIN
     elif [ -f "${lib_python}.dll.a" ]; then
-      ## added a check for .dll.a files for CYGWIN
       python_library+="${lib_python}.dll.a"
     else
       python_library+="${lib_python}.dylib"
@@ -165,10 +165,13 @@ fi
 if $omnisharp_completer; then
   buildcommand="msbuild"
   if ! command_exists msbuild; then
-    buildcommand="xbuild"
-    if ! command_exists xbuild; then
-      echo "msbuild or xbuild is required to build Omnisharp"
-      exit 1
+    buildcommand="msbuild.exe"
+    if ! command_exists msbuild.exe; then
+      buildcommand="xbuild"
+      if ! command_exists xbuild; then
+        echo "msbuild or xbuild is required to build Omnisharp"
+        exit 1
+      fi
     fi
   fi
 

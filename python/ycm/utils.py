@@ -24,8 +24,10 @@ import signal
 import functools
 import socket
 import stat
+import json
 from distutils.spawn import find_executable
 import subprocess
+import collections
 
 WIN_PYTHON27_PATH = 'C:\python27\pythonw.exe'
 WIN_PYTHON26_PATH = 'C:\python26\pythonw.exe'
@@ -40,12 +42,35 @@ def SanitizeQuery( query ):
   return query.strip()
 
 
+# Given an object, returns a str object that's utf-8 encoded.
 def ToUtf8IfNeeded( value ):
   if isinstance( value, unicode ):
     return value.encode( 'utf8' )
   if isinstance( value, str ):
     return value
   return str( value )
+
+
+# Recurses through the object if it's a dict/iterable and converts all the
+# unicode objects to utf-8 strings.
+def RecursiveEncodeUnicodeToUtf8( value ):
+  if isinstance( value, unicode ):
+    return value.encode( 'utf8' )
+  if isinstance( value, str ):
+    return value
+  elif isinstance( value, collections.Mapping ):
+    return dict( map( RecursiveEncodeUnicodeToUtf8, value.iteritems() ) )
+  elif isinstance( value, collections.Iterable ):
+    return type( value )( map( RecursiveEncodeUnicodeToUtf8, value ) )
+  else:
+    return value
+
+
+def ToUtf8Json( data ):
+  return json.dumps( RecursiveEncodeUnicodeToUtf8( data ),
+                     ensure_ascii = False,
+                     # This is the encoding of INPUT str data
+                     encoding = 'utf-8' )
 
 
 def PathToTempDir():
@@ -145,6 +170,10 @@ def PathToFirstExistingExecutable( executable_name_list ):
 
 def OnWindows():
   return sys.platform == 'win32'
+
+
+def OnCygwin():
+  return sys.platform == 'cygwin'
 
 
 # From here: http://stackoverflow.com/a/8536476/1672783
