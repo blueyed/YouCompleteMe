@@ -20,7 +20,7 @@
 import vim
 from ycm.client.base_request import BaseRequest, BuildRequestData, ServerError
 from ycm import vimsupport
-from ycm.utils import ToUtf8IfNeeded
+from ycmd.utils import ToUtf8IfNeeded
 
 def _EnsureBackwardsCompatibility( arguments ):
   if arguments and arguments[ 0 ] == 'GoToDefinitionElseDeclaration':
@@ -66,8 +66,8 @@ class CommandRequest( BaseRequest ):
       vim.eval( 'youcompleteme#OpenGoToList()' )
     else:
       vimsupport.JumpToLocation( self._response[ 'filepath' ],
-                                 self._response[ 'line_num' ] + 1,
-                                 self._response[ 'column_num' ] + 1)
+                                 self._response[ 'line_num' ],
+                                 self._response[ 'column_num' ] )
 
 
 
@@ -87,7 +87,7 @@ def _BuildQfListItem( goto_data_item ):
   if 'description' in goto_data_item:
     qf_item[ 'text' ] = ToUtf8IfNeeded( goto_data_item[ 'description' ] )
   if 'line_num' in goto_data_item:
-    qf_item[ 'lnum' ] = goto_data_item[ 'line_num' ] + 1
+    qf_item[ 'lnum' ] = goto_data_item[ 'line_num' ]
   if 'column_num' in goto_data_item:
-    qf_item[ 'col' ] = goto_data_item[ 'column_num' ]
+    qf_item[ 'col' ] = goto_data_item[ 'column_num' ] - 1
   return qf_item

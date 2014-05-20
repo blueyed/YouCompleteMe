@@ -275,7 +275,7 @@ process.
     support for C-family languages, run the following command in the `ycm_build`
     directory:
 
-        cmake -G "Unix Makefiles" . ~/.vim/bundle/YouCompleteMe/cpp
+        cmake -G "Unix Makefiles" . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
 
     If you DO care about semantic support for C-family languages, then your
     `cmake` call will be a bit more complicated.  We'll assume you downloaded a
@@ -284,7 +284,7 @@ process.
     `lib`, `include` etc. folders right inside that folder). With that in mind,
     run the following command in the `ycm_build` directory:
 
-        cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=~/ycm_temp/llvm_root_dir . ~/.vim/bundle/YouCompleteMe/cpp
+        cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=~/ycm_temp/llvm_root_dir . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
 
     Now that makefiles have been generated, simply run:
 
@@ -549,6 +549,12 @@ You can also style the line that has the warning/error with these groups:
 
 Note that the line highlighting groups only work when gutter signs are turned
 on.
+
+The syntax groups used to highlight regions of text with errors/warnings:
+- `YcmErrorSection`, which falls back to group `SyntasticError` if it exists and
+  then `SpellBad`
+- `YcmWarningSection`, which falls back to group `SyntasticWarning` if it exists
+  and then `SpellCap`
 
 Here's how you'd change the style for a group:
 

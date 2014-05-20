@@ -20,8 +20,8 @@
 import vim
 import os
 import json
-from ycm.utils import ToUtf8IfNeeded
-from ycm import user_options_store
+from ycmd.utils import ToUtf8IfNeeded
+from ycmd import user_options_store
 
 BUFFER_COMMAND_MAP = { 'same-buffer'      : 'edit',
                        'horizontal-split' : 'split',
@@ -156,7 +156,7 @@ def AddDiagnosticSyntaxMatch( line_num,
       "matchadd('{0}', '\%{1}l\%{2}c')".format( group, line_num, column_num ) )
   else:
     return GetIntValue(
-      "matchadd('{0}', '\%{1}l\%{2}c\_.*\%{3}l\%{4}c')".format(
+      "matchadd('{0}', '\%{1}l\%{2}c\_.\\{{-}}\%{3}l\%{4}c')".format(
         group, line_num, column_num, line_end_num, column_end_num ) )
 
 
@@ -242,6 +242,10 @@ def BufferIsUsable( buffer_object ):
   return not BufferModified( buffer_object ) or HiddenEnabled( buffer_object )
 
 
+def EscapedFilepath( filepath ):
+  return filepath.replace( ' ' , r'\ ' )
+
+
 # Both |line| and |column| need to be 1-based
 def JumpToLocation( filename, line, column ):
   # Add an entry to the jumplist
@@ -258,7 +262,8 @@ def JumpToLocation( filename, line, column ):
     command = BUFFER_COMMAND_MAP.get( user_command, 'edit' )
     if command == 'edit' and not BufferIsUsable( vim.current.buffer ):
       command = 'split'
-    vim.command( 'keepjumps {0} {1}'.format( command, filename ) )
+    vim.command( 'keepjumps {0} {1}'.format( command,
+                                             EscapedFilepath( filename ) ) )
   vim.current.window.cursor = ( line, column - 1 )
 
   # Center the screen on the jumped-to location

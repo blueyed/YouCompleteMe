@@ -31,6 +31,7 @@ let s:previous_num_chars_on_current_line = -1
 
 let s:diagnostic_ui_filetypes = {
       \ 'cpp': 1,
+      \ 'cs': 1,
       \ 'c': 1,
       \ 'objc': 1,
       \ 'objcpp': 1,
@@ -45,26 +46,9 @@ function! youcompleteme#Enable()
 
   call s:SetUpBackwardsCompatibility()
 
-  py import sys
-  py import vim
-  exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
-  py from ycm import utils
-  py utils.AddThirdPartyFoldersToSysPath()
-  py from ycm import base
-  py base.LoadJsonDefaultsIntoVim()
-  py from ycm import vimsupport
-  py from ycm import user_options_store
-  py user_options_store.SetAll( base.BuildServerConf() )
-
-  if !pyeval( 'base.CompatibleWithYcmCore()')
-    echohl WarningMsg |
-      \ echomsg "YouCompleteMe unavailable: YCM support libs too old, PLEASE RECOMPILE" |
-      \ echohl None
+  if !s:SetUpPython()
     return
   endif
-
-  py from ycm.youcompleteme import YouCompleteMe
-  py ycm_state = YouCompleteMe( user_options_store.GetAll() )
 
   call s:SetUpCpoptions()
   call s:SetUpCompleteopt()
@@ -105,6 +89,37 @@ function! youcompleteme#Enable()
   " the first loaded file. This should be the last command executed in this
   " function!
   call s:OnBufferVisit()
+endfunction
+
+
+function! s:SetUpPython()
+  py import sys
+  py import vim
+  exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
+  exe 'python sys.path.insert( 0, "' . s:script_folder_path .
+        \ '/../third_party/ycmd" )'
+  py from ycmd import utils
+  exe 'py utils.AddNearestThirdPartyFoldersToSysPath("'
+        \ . s:script_folder_path . '")'
+
+  " We need to import ycmd's third_party folders as well since we import and
+  " use ycmd code in the client.
+  py utils.AddNearestThirdPartyFoldersToSysPath( utils.__file__ )
+  py from ycm import base
+  py base.LoadJsonDefaultsIntoVim()
+  py from ycmd import user_options_store
+  py user_options_store.SetAll( base.BuildServerConf() )
+
+  if !pyeval( 'base.CompatibleWithYcmCore()')
+    echohl WarningMsg |
+      \ echomsg "YouCompleteMe unavailable: YCM support libs too old, PLEASE RECOMPILE" |
+      \ echohl None
+    return 0
+  endif
+
+  py from ycm.youcompleteme import YouCompleteMe
+  py ycm_state = YouCompleteMe( user_options_store.GetAll() )
+  return 1
 endfunction
 
 
