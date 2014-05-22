@@ -1,7 +1,6 @@
 YouCompleteMe: a code-completion engine for Vim
 ===============================================
 
-
 # About this fork
 
 This is a fork of [https://github.com/Valloric/YouCompleteMe](YouCompleteMe),
@@ -17,7 +16,7 @@ with the following notable changes:
 
 # Original documentation
 
-[![Build Status](https://travis-ci.org/Valloric/YouCompleteMe.png?branch=travis)](https://travis-ci.org/Valloric/YouCompleteMe)
+[![Build Status](https://travis-ci.org/Valloric/YouCompleteMe.png?branch=master)](https://travis-ci.org/Valloric/YouCompleteMe)
 
 YouCompleteMe is a fast, as-you-type, fuzzy-search code completion engine for
 [Vim][]. It has several completion engines: an identifier-based engine that
@@ -1778,7 +1777,7 @@ This software is licensed under the [GPL v3 license][gpl].
 [gpl]: http://www.gnu.org/copyleft/gpl.html
 [vim]: http://www.vim.org/
 [syntastic]: https://github.com/scrooloose/syntastic
-[flags_example]: https://github.com/Valloric/YouCompleteMe/blob/master/cpp/ycm/.ycm_extra_conf.py
+[flags_example]: https://github.com/Valloric/ycmd/blob/master/cpp/ycm/.ycm_extra_conf.py
 [compdb]: http://clang.llvm.org/docs/JSONCompilationDatabase.html
 [subsequence]: http://en.wikipedia.org/wiki/Subsequence
 [listtoggle]: https://github.com/Valloric/ListToggle
@@ -1786,7 +1785,7 @@ This software is licensed under the [GPL v3 license][gpl].
 [tracker]: https://github.com/Valloric/YouCompleteMe/issues?state=open
 [issue18]: https://github.com/Valloric/YouCompleteMe/issues/18
 [delimitMate]: https://github.com/Raimondi/delimitMate
-[completer-api]: https://github.com/Valloric/YouCompleteMe/blob/master/python/ycm/completers/completer.py
+[completer-api]: https://github.com/Valloric/ycmd/blob/master/ycmd/completers/completer.py
 [win-wiki]: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
 [eclim]: http://eclim.org/
 [jedi]: https://github.com/davidhalter/jedi
