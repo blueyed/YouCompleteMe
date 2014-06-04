@@ -164,15 +164,21 @@ function! s:SetUpKeyMappings()
       let invoke_key = '<Nul>'
     endif
 
-    " <c-x><c-o> trigger omni completion, <c-p> deselects the first completion
-    " candidate that vim selects by default
-    silent! exe 'inoremap <unique> ' . invoke_key .  ' <C-X><C-O><C-P>'
+    silent! exe 'inoremap <unique> <expr> ' . invoke_key . ' youcompleteme#TriggerOmniComplete()'
   endif
 
   if !empty( g:ycm_key_detailed_diagnostics )
     silent! exe 'nnoremap <unique> ' . g:ycm_key_detailed_diagnostics .
           \ ' :YcmShowDetailedDiagnostic<cr>'
   endif
+endfunction
+
+
+function! youcompleteme#TriggerOmniComplete()
+  " <c-x><c-o> trigger omni completion, <c-p> deselects the first completion
+  " candidate that vim selects by default
+  let s:omnifunc_mode = 1
+  return "\<C-X>\<C-O>\<C-P>"
 endfunction
 
 
@@ -406,20 +412,11 @@ endfunction
 
 
 function! s:SetCompleteFunc()
-  let &completefunc = 'youcompleteme#Complete'
-  let &l:completefunc = 'youcompleteme#Complete'
-
-  if pyeval( 'ycm_state.NativeFiletypeCompletionUsable()' )
-    let &omnifunc = 'youcompleteme#OmniComplete'
-    let &l:omnifunc = 'youcompleteme#OmniComplete'
-
-  " If we don't have native filetype support but the omnifunc is set to YCM's
-  " omnifunc because the previous file the user was editing DID have native
-  " support, we remove our omnifunc.
-  elseif &omnifunc == 'youcompleteme#OmniComplete'
-    let &omnifunc = ''
-    let &l:omnifunc = ''
-  endif
+  " CHANGED: always setup omnifunc (only)
+  " TODO: handle this check somewhere else:
+  "       if pyeval( 'ycm_state.NativeFiletypeCompletionUsable()' )
+  let &omnifunc = 'youcompleteme#Complete'
+  return
 endfunction
 
 
@@ -604,10 +601,6 @@ endfunction
 
 
 function! s:InvokeCompletion()
-  if &completefunc != "youcompleteme#Complete"
-    return
-  endif
-
   if s:InsideCommentOrStringAndShouldStop() || s:OnBlankLine()
     return
   endif
@@ -624,14 +617,14 @@ function! s:InvokeCompletion()
     return
   endif
 
-  " <c-x><c-u> invokes the user's completion function (which we have set to
-  " youcompleteme#Complete), and <c-p> tells Vim to select the previous
+  " <c-x><c-o> invokes the omni completion function (which we have set to
+  " youcompleteme#OmniComplete), and <c-p> tells Vim to select the previous
   " completion candidate. This is necessary because by default, Vim selects the
   " first candidate when completion is invoked, and selecting a candidate
   " automatically replaces the current text with it. Calling <c-p> forces Vim to
   " deselect the first candidate and in turn preserve the user's current text
   " until he explicitly chooses to replace it with a completion.
-  call feedkeys( "\<C-X>\<C-U>\<C-P>", 'n' )
+  call feedkeys( "\<C-X>\<C-O>\<C-P>", 'n' )
 endfunction
 
 
@@ -658,14 +651,6 @@ endfunction
 
 " This is our main entry point. This is what vim calls to get completions.
 function! youcompleteme#Complete( findstart, base )
-  " After the user types one character after the call to the omnifunc, the
-  " completefunc will be called because of our mapping that calls the
-  " completefunc on every keystroke. Therefore we need to delegate the call we
-  " 'stole' back to the omnifunc
-  if s:omnifunc_mode
-    return youcompleteme#OmniComplete( a:findstart, a:base )
-  endif
-
   if a:findstart
     " InvokeCompletion has this check but we also need it here because of random
     " Vim bugs and unfortunate interactions with the autocommands of other
@@ -679,7 +664,12 @@ function! youcompleteme#Complete( findstart, base )
     if !pyeval( 'ycm_state.IsServerAlive()' )
       return -2
     endif
-    py ycm_state.CreateCompletionRequest()
+    echom "omnifunc_mode:" s:omnifunc_mode
+    if s:omnifunc_mode
+      py ycm_state.CreateCompletionRequest( force_semantic = True )
+    else
+      py ycm_state.CreateCompletionRequest()
+    endif
     return pyeval( 'base.CompletionStartColumn()' )
   else
     return s:GetCompletions()
@@ -688,16 +678,8 @@ endfunction
 
 
 function! youcompleteme#OmniComplete( findstart, base )
-  if a:findstart
-    if !pyeval( 'ycm_state.IsServerAlive()' )
-      return -2
-    endif
-    let s:omnifunc_mode = 1
-    py ycm_state.CreateCompletionRequest( force_semantic = True )
-    return pyeval( 'base.CompletionStartColumn()' )
-  else
-    return s:GetCompletions()
-  endif
+  let s:omnifunc_mode = 1
+  return youcompleteme#Complete( a:findstart, a:base )
 endfunction
 
 

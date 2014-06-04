@@ -1784,14 +1784,6 @@ buffer, run ':echo tagfiles()' with the relevant buffer active. Note that that
 function will only list tag files that already exist.
 
 -------------------------------------------------------------------------------
-                                                                   *CTRL-sub-U*
-'CTRL-U' in insert mode does not work ~
-
-YCM keeps you in a 'completefunc' completion mode when you're typing in insert
-mode and Vim disables '<C-U>' in completion mode as a "feature." Sadly there's
-nothing I can do about this.
-
--------------------------------------------------------------------------------
                      *youcompleteme-ycm-conflicts-with-ultisnips-tab-key-usage*
 YCM conflicts with UltiSnips TAB key usage ~
 
