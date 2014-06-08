@@ -175,7 +175,7 @@ endfunction
 
 
 function! youcompleteme#TriggerOmniComplete()
-  " <c-x><c-o> trigger omni completion, <c-p> deselects the first completion
+  " <c-x><c-o> triggers omni completion, <c-p> deselects the first completion
   " candidate that vim selects by default
   let s:omnifunc_mode = 1
   return "\<C-X>\<C-O>\<C-P>"
