@@ -406,19 +406,20 @@ endfunction
 
 
 function! s:SetCompleteFunc()
-  let &completefunc = 'youcompleteme#Complete'
-  let &l:completefunc = 'youcompleteme#Complete'
+  if g:ycm_set_omnifunc
+    if pyeval( 'ycm_state.NativeFiletypeCompletionUsable()' )
+      if &omnifunc != 'youcompleteme#OmniComplete'
+        let b:ycm_old_omnifunc = &omnifunc
+        let &omnifunc = 'youcompleteme#OmniComplete'
+      endif
 
-  if pyeval( 'ycm_state.NativeFiletypeCompletionUsable()' )
-    let &omnifunc = 'youcompleteme#OmniComplete'
-    let &l:omnifunc = 'youcompleteme#OmniComplete'
-
-  " If we don't have native filetype support but the omnifunc is set to YCM's
-  " omnifunc because the previous file the user was editing DID have native
-  " support, we remove our omnifunc.
-  elseif &omnifunc == 'youcompleteme#OmniComplete'
-    let &omnifunc = ''
-    let &l:omnifunc = ''
+    " If we don't have native filetype support but the omnifunc is set to YCM's
+    " omnifunc because the previous file the user was editing DID have native
+    " support, we remove our omnifunc.
+    elseif exists('b:ycm_old_omnifunc')
+      let &omnifunc = b:ycm_old_omnifunc
+      unlet b:ycm_old_omnifunc
+    endif
   endif
 endfunction
 
@@ -471,6 +472,12 @@ endfunction
 
 
 function! s:OnInsertLeave()
+  " Restore any old completefunc always.
+  if exists('b:ycm_old_completefunc')
+    let &completefunc = b:ycm_old_completefunc
+    unlet b:ycm_old_completefunc
+  endif
+
   if !s:AllowedToCompleteInCurrentFile()
     return
   endif
@@ -488,6 +495,11 @@ endfunction
 function! s:OnInsertEnter()
   if !s:AllowedToCompleteInCurrentFile()
     return
+  endif
+
+  if g:ycm_set_completefunc
+    let b:ycm_old_completefunc = &completefunc
+    let &completefunc = 'youcompleteme#Complete'
   endif
 
   let s:old_cursor_position = []

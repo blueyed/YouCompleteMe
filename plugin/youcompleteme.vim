@@ -167,6 +167,12 @@ let g:ycm_warning_symbol =
 let g:ycm_goto_buffer_command =
       \ get( g:, 'ycm_goto_buffer_command', 'same-buffer' )
 
+let g:ycm_set_completefunc =
+      \ get( g:, 'ycm_set_completefunc', 1 )
+
+let g:ycm_set_omnifunc =
+      \ get( g:, 'ycm_set_omnifunc', 1 )
+
 " On-demand loading. Let's use the autoload folder and not slow down vim's
 " startup procedure.
 augroup youcompletemeStart
