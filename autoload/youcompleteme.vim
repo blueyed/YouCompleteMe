@@ -39,11 +39,6 @@ let s:diagnostic_ui_filetypes = {
 
 
 function! youcompleteme#Enable()
-  " When vim is in diff mode, don't run
-  if &diff
-    return
-  endif
-
   call s:SetUpBackwardsCompatibility()
 
   if !s:SetUpPython()
