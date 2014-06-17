@@ -633,6 +633,10 @@ endfunction
 python << EOF
 def GetCompletionsInner():
   request = ycm_state.GetCurrentCompletionRequest()
+  # Might be None (via SuperTabCodeComplete..CompleteViaSuperTab..youcompleteme#Complete..<SNR>281_GetCompletions)
+  if request is None:
+    return { 'words' : [], 'refresh' : 'always'}
+
   request.Start()
   while not request.Done():
     if bool( int( vim.eval( 'complete_check()' ) ) ):
