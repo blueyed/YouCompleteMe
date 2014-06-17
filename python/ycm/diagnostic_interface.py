@@ -155,5 +155,5 @@ def _ConvertDiagListToDict( diag_list ):
 
 
 def _DiagnosticIsError( diag ):
-  return diag[ 'kind' ] == 'E'
+  return diag[ 'kind' ] == 'ERROR'
 

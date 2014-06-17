@@ -135,6 +135,11 @@ def UnplaceSignsInBuffer( buffer_number, signs ):
 
 
 def PlaceSign( sign_id, line_num, buffer_num, is_error = True ):
+  # libclang can give us diagnostics that point "outside" the file; Vim borks
+  # on these.
+  if line_num < 1:
+    line_num = 1
+
   sign_name = 'YcmError' if is_error else 'YcmWarning'
   vim.command( 'sign place {0} line={1} name={2} buffer={3}'.format(
     sign_id, line_num, sign_name, buffer_num ) )
@@ -201,7 +206,7 @@ def ConvertDiagnosticsToQfList( diagnostics ):
     # line/column numbers are 1 or 0 based in its various APIs. Here, it wants
     # them to be 1-based.
     location = diagnostic[ 'location' ]
-    line_num = location[ 'line_num' ] + 1
+    line_num = location[ 'line_num' ]
 
     # libclang can give us diagnostics that point "outside" the file; Vim borks
     # on these.
@@ -211,9 +216,9 @@ def ConvertDiagnosticsToQfList( diagnostics ):
     return {
       'bufnr' : GetBufferNumberForFilename( location[ 'filepath' ] ),
       'lnum'  : line_num,
-      'col'   : location[ 'column_num' ] + 1,
+      'col'   : location[ 'column_num' ],
       'text'  : ToUtf8IfNeeded( diagnostic[ 'text' ] ),
-      'type'  : diagnostic[ 'kind' ],
+      'type'  : diagnostic[ 'kind' ][ 0 ],
       'valid' : 1
     }
 
