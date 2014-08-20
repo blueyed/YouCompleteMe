@@ -125,6 +125,7 @@ class YouCompleteMe( object ):
 
       self._server_popen = utils.SafePopen( args, stdout = PIPE, stderr = PIPE)
       BaseRequest.server_location = 'http://127.0.0.1:' + str( server_port )
+      BaseRequest.server_popen_args = args
       BaseRequest.hmac_secret = hmac_secret
 
     self._NotifyUserIfServerCrashed()
@@ -324,6 +325,8 @@ class YouCompleteMe( object ):
       debug_info += '\nServer logfiles:\n  {0}\n  {1}'.format(
         self._server_stdout,
         self._server_stderr )
+    debug_info += '\nServer command: {0}'.format(
+        " ".join(BaseRequest.server_popen_args) )
 
     return debug_info
 
