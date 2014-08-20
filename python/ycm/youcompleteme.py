@@ -281,9 +281,9 @@ class YouCompleteMe( object ):
     if self.DiagnosticsForCurrentFileReady():
       diagnostics = self._latest_file_parse_request.Response()
       # We set the diagnostics request to None because we want to prevent
-      # Syntastic from repeatedly refreshing the buffer with the same diags.
-      # Setting this to None makes DiagnosticsForCurrentFileReady return False
-      # until the next request is created.
+      # repeated refreshing of the buffer with the same diags. Setting this to
+      # None makes DiagnosticsForCurrentFileReady return False until the next
+      # request is created.
       self._latest_file_parse_request = None
       if qflist_format:
         return vimsupport.ConvertDiagnosticsToQfList( diagnostics )
@@ -353,7 +353,11 @@ class YouCompleteMe( object ):
   def _AddTagsFilesIfNeeded( self, extra_data ):
     def GetTagFiles():
       tag_files = vim.eval( 'tagfiles()' )
-      current_working_directory = os.getcwd()
+      # getcwd() throws an exception when the CWD has been deleted.
+      try:
+        current_working_directory = os.getcwd()
+      except OSError:
+        return []
       return [ os.path.join( current_working_directory, x ) for x in tag_files ]
 
     if not self._user_options[ 'collect_identifiers_from_tags_files' ]:
