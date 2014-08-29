@@ -429,8 +429,6 @@ out the YCM repository. That's it.
 
 But again, installing YCM with Vundle takes care of all of this for you.
 
-In the future expect to see features like go-to-definition for Python as well.
-
 ### C# semantic completion
 
 YCM uses [OmniSharp][] to provide semantic completion for C#. It's used as a git
@@ -1373,6 +1371,12 @@ trigger. So when the user types `foo.`, the semantic engine will trigger and
 serve `foo`'s list of member functions and variables. Since C++ also has `->`
 listed as a trigger, the same thing would happen when the user typed `foo->`.
 
+It's also possible to use a regular expression as a trigger. You have to prefix
+your trigger with `re!` to signify it's a regex trigger. For instance,
+`re!\w+\.` would only trigger after the `\w+\.` regex matches.
+
+NOTE: The regex syntax is **NOT** Vim's, it's [Python's][python-re].
+
 Default: `[see next line]`
 
     let g:ycm_semantic_triggers =  {
@@ -1382,7 +1386,8 @@ Default: `[see next line]`
       \   'cpp,objcpp' : ['->', '.', '::'],
       \   'perl' : ['->'],
       \   'php' : ['->', '::'],
-      \   'cs,java,javascript,d,vim,python,perl6,scala,vb,elixir,go' : ['.'],
+      \   'cs,java,javascript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+      \   'vim' : ['re![_a-zA-Z]+[_\w]*\.'],
       \   'ruby' : ['.', '::'],
       \   'lua' : ['.', ':'],
       \   'erlang' : [':'],
@@ -1687,7 +1692,13 @@ for bug reports and feature requests.
 ### I get an internal compiler error when installing
 
 This can be a problem on virtual servers with limited memory. A possible
-solution is to add more swap memory.
+solution is to add more swap memory. A more practical solution would be to force
+the build script to run only one compile job at a time. You can do this by
+setting the `YCM_CORES` environment variable to `1`. Example:
+
+```
+YCM_CORES=1 ./install.sh --clang-completer
+```
 
 ### I get weird errors when I press `Ctrl-C` in Vim
 
@@ -1822,3 +1833,4 @@ This software is licensed under the [GPL v3 license][gpl].
 [issue-593]: https://github.com/Valloric/YouCompleteMe/issues/593
 [issue-669]: https://github.com/Valloric/YouCompleteMe/issues/669
 [status-mes]: https://groups.google.com/forum/#!topic/vim_dev/WeBBjkXE8H8
+[python-re]: https://docs.python.org/2/library/re.html#regular-expression-syntax
