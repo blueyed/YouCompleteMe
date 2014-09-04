@@ -1424,6 +1424,7 @@ be switched (when buffer is modified and `nohidden` option is set),
 then result will be opened in horizontal split.
 
 Default: `'same-buffer'`
+
     let g:ycm_goto_buffer_command = 'same-buffer'
 
 FAQ

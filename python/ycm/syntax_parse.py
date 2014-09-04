@@ -56,12 +56,18 @@ SYNTAX_ARGUMENTS = set([
   'excludenl',
 ])
 
+# We want to parse lines starting with these args
+ALLOWED_SYNTAX_ARGUMENTS = set([
+  'contained',
+])
+
 # These are the parent groups from which we want to extract keywords
 ROOT_GROUPS = set([
   'Statement',
   'Boolean',
   'Include',
   'Type',
+  'Identifier',
 ])
 
 
@@ -132,15 +138,17 @@ def _CreateInitialGroupMap():
     group_name_to_group[ name ] = new_group
     parent.children.append( new_group )
 
-  statement_group = SyntaxGroup( 'Statement' )
-  type_group      = SyntaxGroup( 'Type' )
+  statement_group  = SyntaxGroup( 'Statement' )
+  type_group       = SyntaxGroup( 'Type' )
+  identifier_group = SyntaxGroup( 'Identifier' )
 
   # See `:h group-name` for details on how the initial group hierarchy is built
   group_name_to_group = {
     'Statement': statement_group,
     'Type': type_group,
     'Boolean': SyntaxGroup( 'Boolean' ),
-    'Include': SyntaxGroup( 'Include' )
+    'Include': SyntaxGroup( 'Include' ),
+    'Identifier': identifier_group,
   }
 
   AddToGroupMap( 'Conditional', statement_group )
@@ -149,11 +157,12 @@ def _CreateInitialGroupMap():
   AddToGroupMap( 'Operator'   , statement_group )
   AddToGroupMap( 'Keyword'    , statement_group )
   AddToGroupMap( 'Exception'  , statement_group )
-  AddToGroupMap( 'Function'   , statement_group )
 
   AddToGroupMap( 'StorageClass', type_group )
   AddToGroupMap( 'Structure'   , type_group )
   AddToGroupMap( 'Typedef'     , type_group )
+
+  AddToGroupMap( 'Function', identifier_group )
 
   return group_name_to_group
 
@@ -193,7 +202,8 @@ def _ExtractKeywordsFromGroup( group ):
       continue
 
     words = line.split()
-    if not words or words[ 0 ] in SYNTAX_ARGUMENTS:
+    if not words or ( words[ 0 ] in SYNTAX_ARGUMENTS and
+                      words[ 0 ] not in ALLOWED_SYNTAX_ARGUMENTS ):
       continue
 
     for word in words:
