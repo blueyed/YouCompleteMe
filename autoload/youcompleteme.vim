@@ -45,7 +45,7 @@ function! youcompleteme#Enable()
 
   call s:SetUpBackwardsCompatibility()
 
-  if !s:SetUpPython()
+  if s:SetUpPython() != 1  " might be -1 when the function aborts.
     return
   endif
 
@@ -91,7 +91,7 @@ function! youcompleteme#Enable()
 endfunction
 
 
-function! s:SetUpPython()
+function! s:SetUpPython() abort
   py import sys
   py import vim
   exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
