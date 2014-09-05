@@ -40,7 +40,9 @@ let s:diagnostic_ui_filetypes = {
 function! youcompleteme#Enable()
   call s:SetUpBackwardsCompatibility()
 
-  if s:SetUpPython() != 1  " might be -1 when the function aborts.
+  " This can be 0 if YCM libs are old or -1 if an exception occured while
+  " executing the function.
+  if s:SetUpPython() != 1
     return
   endif
 
