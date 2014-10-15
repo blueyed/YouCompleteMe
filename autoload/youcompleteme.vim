@@ -61,10 +61,9 @@ function! youcompleteme#Enable()
     set ut=2000
   endif
 
+  call youcompleteme#EnableCursorMovedAutocommands()
   augroup youcompleteme
     autocmd!
-    autocmd CursorMovedI * call s:OnCursorMovedInsertMode()
-    autocmd CursorMoved * call s:OnCursorMovedNormalMode()
     " Note that these events will NOT trigger for the file vim is started with;
     " so if you do "vim foo.cc", these events will not trigger when that buffer
     " is read. This is because youcompleteme#Enable() is called on VimEnter and
@@ -85,6 +84,21 @@ function! youcompleteme#Enable()
   " the first loaded file. This should be the last command executed in this
   " function!
   call s:OnBufferVisit()
+endfunction
+
+
+function! youcompleteme#EnableCursorMovedAutocommands()
+    augroup ycmcompletemecursormove
+        autocmd!
+        autocmd CursorMovedI * call s:OnCursorMovedInsertMode()
+        autocmd CursorMoved * call s:OnCursorMovedNormalMode()
+    augroup END
+endfunction
+
+
+function! youcompleteme#DisableCursorMovedAutocommands()
+    autocmd! ycmcompletemecursormove CursorMoved *
+    autocmd! ycmcompletemecursormove CursorMovedI *
 endfunction
 
 
