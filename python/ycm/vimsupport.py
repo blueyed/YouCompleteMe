@@ -137,11 +137,16 @@ def GetBufferFilepath( buffer_object ):
   return os.path.join( folder_path, str( buffer_object.number ) )
 
 
-def UnplaceSignsInBuffer( buffer_number, signs ):
+# NOTE: This unplaces *all* signs in a buffer, not just the ones we placed. We
+# used to track which signs we ended up placing and would then only unplace
+# ours, but that causes flickering Vim since we have to call
+#    sign unplace <id> buffer=<buffer-num>
+# in a loop. So we're forced to unplace all signs, which might conflict with
+# other Vim plugins.
+def UnplaceAllSignsInBuffer( buffer_number ):
   if buffer_number < 0:
     return
-  for sign in signs:
-    vim.command( 'sign unplace {0} buffer={1}'.format( sign, buffer_number ) )
+  vim.command( 'sign unplace * buffer={0}'.format( buffer_number ) )
 
 
 def PlaceSign( sign_id, line_num, buffer_num, is_error = True ):
