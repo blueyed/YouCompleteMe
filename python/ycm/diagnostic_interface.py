@@ -45,7 +45,9 @@ class DiagnosticInterface( object ):
 
 
   def UpdateWithNewDiagnostics( self, diags ):
-    self._buffer_number_to_line_to_diags = _ConvertDiagListToDict( diags )
+    normalized_diags = [ _NormalizeDiagnostic( x ) for x in diags ]
+    self._buffer_number_to_line_to_diags = _ConvertDiagListToDict(
+        normalized_diags )
 
     if self._user_options[ 'enable_diagnostic_signs' ]:
       self._placed_signs, self._next_sign_id = _UpdateSigns(
@@ -58,7 +60,7 @@ class DiagnosticInterface( object ):
 
     if self._user_options[ 'always_populate_location_list' ]:
       vimsupport.SetLocationList(
-        vimsupport.ConvertDiagnosticsToQfList( diags ) )
+        vimsupport.ConvertDiagnosticsToQfList( normalized_diags ) )
 
 
   def _EchoDiagnosticForLine( self, line_num ):
@@ -165,14 +167,14 @@ def _GetKeptAndNewSigns( placed_signs, buffer_number_to_line_to_diags,
 
 
 def _PlaceNewSigns( kept_signs, new_signs ):
-  placed_signs = kept_signs
+  placed_signs = kept_signs[:]
   for sign in new_signs:
     # Do not set two signs on the same line, it will screw up storing sign
     # locations.
     if sign in placed_signs:
       continue
     vimsupport.PlaceSign( sign.id, sign.line, sign.buffer, sign.is_error )
-    placed_signs += [ sign ]
+    placed_signs.append(sign)
   return placed_signs
 
 
@@ -202,6 +204,16 @@ def _ConvertDiagListToDict( diag_list ):
 
 def _DiagnosticIsError( diag ):
   return diag[ 'kind' ] == 'ERROR'
+
+
+def _NormalizeDiagnostic( diag ):
+  def ClampToOne( value ):
+    return value if value > 0 else 1
+
+  location = diag[ 'location' ]
+  location[ 'column_num' ] = ClampToOne( location[ 'column_num' ] )
+  location[ 'line_num' ] = ClampToOne( location[ 'line_num' ] )
+  return diag
 
 
 class _DiagSignPlacement( namedtuple( "_DiagSignPlacement",
