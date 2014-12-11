@@ -130,8 +130,14 @@ function! s:SetUpPython() abort
     return 0
   endif
 
-  py from ycm.youcompleteme import YouCompleteMe
-  py ycm_state = YouCompleteMe( user_options_store.GetAll() )
+py << EOF
+from ycm.youcompleteme import YouCompleteMe
+try:
+    ycm_state = YouCompleteMe( user_options_store.GetAll() )
+except RuntimeError as e:
+    vim.command('echohl WarningMsg | echomsg "YouCompleteMe error: %s" | echohl None' % (e,))
+EOF
+
   return 1
 endfunction
 
