@@ -190,14 +190,22 @@ YCM has **no official support for Windows**, but that doesn't mean you can't get
 it to work there. See the [Windows Installation Guide][win-wiki] wiki page. Feel
 free to add to it.
 
-OpenBSD Installation
---------------------
-Please refer to the full Installation Guide below; the following commands are
-provided on a best-effort basis and may not work for you.
+FreeBSD/OpenBSD Installation
+----------------------------
 
-Make sure you have Vim 7.3.584 with python2 support. OpenBSD 5.5 and later have
-a Vim that's recent enough. You can see the version of Vim installed by running
-`vim --version`.
+Please refer to the full Installation Guide below; the following commands are
+provided on a best-effort basis and may not work for you. OpenBSD / FreeBSD are
+not officially supported platforms by YCM.
+
+Make sure you have Vim 7.3.584 with python2 support.
+
+OpenBSD 5.5 and later have a Vim that's recent enough. You can see the version of
+Vim installed by running `vim --version`.
+
+FreeBSD 10.x comes with clang compiler but not the libraries needed to install.
+
+    pkg install llvm35 boost-all boost-python-libs clang35
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/llvm35/lib/
 
 Install YouCompleteMe with [Vundle][].
 
@@ -211,7 +219,7 @@ Install dependencies and CMake: `sudo pkg_add llvm boost cmake`
 Compiling YCM **with** semantic support for C-family languages:
 
     cd ~/.vim/bundle/YouCompleteMe
-    ./install.sh --clang-completer --system-clang --system-boost
+    ./install.sh --clang-completer --system-libclang --system-boost
 
 Compiling YCM **without** semantic support for C-family languages:
 
@@ -1482,6 +1490,15 @@ then result will be opened in horizontal split.
 Default: `'same-buffer'`
 
     let g:ycm_goto_buffer_command = 'same-buffer'
+
+### The `g:ycm_disable_for_files_larger_than_kb` option
+
+Defines the max size (in Kb) for a file to be considered for completion. If this
+option is set to 0 then no check is made on the size of the file you're opening
+
+Default: 1000
+
+    let g:ycm_disable_for_files_larger_than_kb = 1000
 
 FAQ
 ---
