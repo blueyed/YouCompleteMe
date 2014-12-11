@@ -136,6 +136,7 @@ try:
     ycm_state = YouCompleteMe( user_options_store.GetAll() )
 except RuntimeError as e:
     vim.command('echohl WarningMsg | echomsg "YouCompleteMe error: %s" | echohl None' % (e,))
+    vim.command('return 0')
 EOF
 
   return 1
