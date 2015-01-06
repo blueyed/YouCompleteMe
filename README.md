@@ -279,7 +279,7 @@ process.
     repository (Vundle will do this for you) to fetch YCM's dependencies.
 
 3.  [Complete this step ONLY if you care about semantic completion support for
-    C-family languages. Otherwise it's not neccessary.]
+    C-family languages. Otherwise it's not necessary.]
 
     **Download the latest version of `libclang`**. Clang is an open-source
     compiler that can compile C/C++/Objective-C/Objective-C++. The `libclang`
@@ -326,7 +326,7 @@ process.
         cmake -G "Unix Makefiles" . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
 
     For those who want to use the system version of boost, you would pass
-    `-DUSE_SYSTEM_BOOST=ON` to cmake. This may be neccassery on some systems
+    `-DUSE_SYSTEM_BOOST=ON` to cmake. This may be necessary on some systems
     where the bundled version of boost doesn't compile out of the box.
 
     NOTE: We **STRONGLY recommended AGAINST use** of the system boost instead
@@ -461,7 +461,8 @@ of projects.
 Yes, [Clang's `CompilationDatabase` system][compdb] is also supported. Again,
 see the above linked example file. You can get CMake to generate this file for
 you by adding `set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )` to your project's
-`CMakeLists.txt` file (if using CMake).
+`CMakeLists.txt` file (if using CMake). If you're not using CMake, you could use
+something like [Bear][] to generate the `compile_commands.json` file.
 
 If Clang encounters errors when compiling the header files that your file
 includes, then it's probably going to take a long time to get completions.  When
@@ -1736,7 +1737,7 @@ YCM needs to perform subsequence-based filtering on _all_ of those identifiers
 I'm sorry, but that level of performance is just plain impossible to achieve
 with VimScript. I've tried, and the language is just too slow. No, you can't get
 acceptable performance even if you limit yourself to just the identifiers in the
-current file and simple prefix-based fitering.
+current file and simple prefix-based filtering.
 
 ### Why does YCM demand such a recent version of Vim?
 
@@ -1908,3 +1909,4 @@ This software is licensed under the [GPL v3 license][gpl].
 [issue-669]: https://github.com/Valloric/YouCompleteMe/issues/669
 [status-mes]: https://groups.google.com/forum/#!topic/vim_dev/WeBBjkXE8H8
 [python-re]: https://docs.python.org/2/library/re.html#regular-expression-syntax
+[bear]: https://github.com/rizsotto/Bear
