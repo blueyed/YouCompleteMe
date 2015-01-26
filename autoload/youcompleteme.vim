@@ -92,9 +92,6 @@ endfunction
 function! youcompleteme#EnableCursorMovedAutocommands()
     augroup ycmcompletemecursormove
         autocmd!
-        " When completion is done, reset the old cursor position, e.g. after
-        " <C-w>. Otherwise <c-x><c-u> aborts because of !s:cursor_moved.
-        autocmd CompleteDone * let s:old_cursor_position = []
         autocmd CursorMovedI * call s:OnCursorMovedInsertMode()
         autocmd CursorMoved * call s:OnCursorMovedNormalMode()
     augroup END
