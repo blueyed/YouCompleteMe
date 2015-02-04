@@ -681,6 +681,16 @@ def GetCompletionsInner():
       return { 'words' : [], 'refresh' : 'always'}
 
   results = base.AdjustCandidateInsertionText( request.Response() )
+
+  # Tag entries coming from ycm.
+  padlength = 0
+  for w in results:
+    if 'menu' in w and len(w['menu']) + 1 > padlength:
+      padlength = len(w['menu']) + 1
+  results = [w.update({
+    'menu': ('{:<'+str(padlength)+'}').format(
+      w['menu'] + ' ' if 'menu' in w else '') + '[ycm]'}) or w for w in results]
+
   return { 'words' : results, 'refresh' : 'always' }
 EOF
 
