@@ -715,6 +715,7 @@ function! youcompleteme#Complete( findstart, base )
     if !pyeval( 'ycm_state.IsServerAlive()' )
       return -2
     endif
+    call s:UpdateCursorMoved()
     py ycm_state.CreateCompletionRequest()
     return pyeval( 'base.CompletionStartColumn()' )
   else
@@ -729,6 +730,7 @@ function! youcompleteme#OmniComplete( findstart, base )
       return -2
     endif
     let s:omnifunc_mode = 1
+    call s:UpdateCursorMoved()
     py ycm_state.CreateCompletionRequest( force_semantic = True )
     return pyeval( 'base.CompletionStartColumn()' )
   else
