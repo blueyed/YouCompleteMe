@@ -329,7 +329,12 @@ def JumpToLocation( filename, line, column ):
       command = 'split'
     vim.command( 'keepjumps {0} {1}'.format( command,
                                              EscapedFilepath( filename ) ) )
-  vim.current.window.cursor = ( line, column - 1 )
+  try:
+    vim.current.window.cursor = ( line, column - 1 )
+  except Exception as e:
+    PostVimMessage('Error: could not set line/cursor to {0}/{1}: {2}'.format(
+      line, column, e))
+
 
   # Center the screen on the jumped-to location
   vim.command( 'normal! zz' )
