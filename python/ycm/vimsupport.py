@@ -297,7 +297,13 @@ def HiddenEnabled( buffer_object ):
   return bool( int( GetBufferOption( buffer_object, 'hid' ) ) )
 
 
+def BufHiddenSet( buffer_object ):
+  return bool( len( GetBufferOption( buffer_object, 'bufhidden' ) ) )
+
+
 def BufferIsUsable( buffer_object ):
+  if BufHiddenSet( buffer_object ):
+    return False
   return not BufferModified( buffer_object ) or HiddenEnabled( buffer_object )
 
 
