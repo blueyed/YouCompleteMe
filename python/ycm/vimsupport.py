@@ -126,7 +126,11 @@ def BufferIsVisible( buffer_number ):
 
 def GetBufferFilepath( buffer_object ):
   if buffer_object.name:
-    return buffer_object.name
+    fname = buffer_object.name
+    if fname.startswith('fugitive:///'):
+      fname = GetVariableValue('fugitive#buffer().repo().translate(fugitive#buffer().path())')
+    return fname
+
   # Buffers that have just been created by a command like :enew don't have any
   # buffer name so we use the buffer number for that. Also, os.getcwd() throws
   # an exception when the CWD has been deleted so we handle that.
@@ -293,7 +297,13 @@ def HiddenEnabled( buffer_object ):
   return bool( int( GetBufferOption( buffer_object, 'hid' ) ) )
 
 
+def BufHiddenSet( buffer_object ):
+  return bool( len( GetBufferOption( buffer_object, 'bufhidden' ) ) )
+
+
 def BufferIsUsable( buffer_object ):
+  if BufHiddenSet( buffer_object ):
+    return False
   return not BufferModified( buffer_object ) or HiddenEnabled( buffer_object )
 
 
@@ -319,7 +329,12 @@ def JumpToLocation( filename, line, column ):
       command = 'split'
     vim.command( 'keepjumps {0} {1}'.format( command,
                                              EscapedFilepath( filename ) ) )
-  vim.current.window.cursor = ( line, column - 1 )
+  try:
+    vim.current.window.cursor = ( line, column - 1 )
+  except Exception as e:
+    PostVimMessage('Error: could not set line/cursor to {0}/{1}: {2}'.format(
+      line, column, e))
+
 
   # Center the screen on the jumped-to location
   vim.command( 'normal! zz' )
