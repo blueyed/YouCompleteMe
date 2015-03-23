@@ -126,7 +126,11 @@ def BufferIsVisible( buffer_number ):
 
 def GetBufferFilepath( buffer_object ):
   if buffer_object.name:
-    return buffer_object.name
+    fname = buffer_object.name
+    if fname.startswith('fugitive:///'):
+      fname = GetVariableValue('fugitive#buffer().repo().translate(fugitive#buffer().path())')
+    return fname
+
   # Buffers that have just been created by a command like :enew don't have any
   # buffer name so we use the buffer number for that. Also, os.getcwd() throws
   # an exception when the CWD has been deleted so we handle that.
