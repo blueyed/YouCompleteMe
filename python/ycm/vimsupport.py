@@ -128,7 +128,11 @@ def GetBufferFilepath( buffer_object ):
   if buffer_object.name:
     fname = buffer_object.name
     if fname.startswith('fugitive:///'):
-      fname = GetVariableValue('fugitive#buffer().repo().translate(fugitive#buffer().path())')
+      try:
+        fname = GetVariableValue("fugitive#buffer('{0}').path()".format(
+          EscapeForVim(fname)))
+      except Exception as e:
+        PostVimMessage('Could not resolve fugitive buffer name: {0}'.format(e))
     return fname
 
   # Buffers that have just been created by a command like :enew don't have any
