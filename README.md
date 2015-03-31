@@ -141,8 +141,9 @@ using Vundle and the ycm_support_libs library APIs have changed (happens
 rarely), YCM will notify you to recompile it. You should then rerun the install
 process.
 
-It's recommended that you have the latest Xcode installed along with the latest
-Command Line Tools (that you install from within Xcode).
+**NOTE:** If you want C-family completion, you MUST have the latest Xcode
+installed along with the latest Command Line Tools (they are installed when you
+start Xcode for the first time).
 
 Install CMake. Preferably with [Homebrew][brew], but here's the [stand-alone
 CMake installer][cmake-download].
@@ -289,8 +290,10 @@ process.
     support for python2 scripting**.
 
     Inside Vim, type `:version`. Look at the first two to three lines of output;
-    it should say `Vi IMproved 7.3` and then below that, `Included patches:
-    1-X`, where X will be some number. That number needs to be 584 or higher.
+    it should say `Vi IMproved X.Y`, where X.Y is the major version of vim. If
+    your version is greater than 7.3, then you're all set. If your version is
+    7.3 then look below that where it says, `Included patches: 1-Z`, where Z
+    will be some number. That number needs to be 584 or higher.
 
     If your version of Vim is not recent enough, you may need to [compile Vim
     from source][vim-build] (don't worry, it's easy).
@@ -313,7 +316,7 @@ process.
     **Download the latest version of `libclang`**. Clang is an open-source
     compiler that can compile C/C++/Objective-C/Objective-C++. The `libclang`
     library it provides is used to power the YCM semantic completion engine for
-    those languages. YCM is designed to work with libclang version 3.5 or
+    those languages. YCM is designed to work with libclang version 3.6 or
     higher, but can in theory work with any 3.2+ version as well.
 
     You can use the system libclang _only if you are sure it is version 3.3 or
@@ -321,7 +324,7 @@ process.
     binaries from llvm.org][clang-download] if at all possible. Make sure you
     download the correct archive file for your OS.
 
-    We **STRONGLY recommended AGAINST use** of the system libclang instead of
+    We **STRONGLY recommend AGAINST use** of the system libclang instead of
     the upstream compiled binaries. Random things may break. Save yourself the
     hassle and use the upstream pre-built libclang.
 
@@ -358,7 +361,7 @@ process.
     `-DUSE_SYSTEM_BOOST=ON` to cmake. This may be necessary on some systems
     where the bundled version of boost doesn't compile out of the box.
 
-    NOTE: We **STRONGLY recommended AGAINST use** of the system boost instead
+    NOTE: We **STRONGLY recommend AGAINST use** of the system boost instead
     of the bundled version of boost. Random things may break. Save yourself
     the hassle and use the bundled version of boost.
 
@@ -366,8 +369,13 @@ process.
     `cmake` call will be a bit more complicated.  We'll assume you downloaded a
     binary distribution of LLVM+Clang from llvm.org in step 3 and that you
     extracted the archive file to folder `~/ycm_temp/llvm_root_dir` (with `bin`,
-    `lib`, `include` etc. folders right inside that folder). With that in mind,
-    run the following command in the `ycm_build` directory:
+    `lib`, `include` etc. folders right inside that folder).
+
+    NOTE: This _only_ works with a _downloaded_ LLVM binary package, not a
+    custom-built LLVM! See docs below for `EXTERNAL_LIBCLANG_PATH` when using a
+    custom LLVM build.
+
+    With that in mind, run the following command in the `ycm_build` directory:
 
         cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=~/ycm_temp/llvm_root_dir . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
 
@@ -379,14 +387,15 @@ process.
     `-DUSE_SYSTEM_LIBCLANG=ON` to cmake _instead of_ the
     `-DPATH_TO_LLVM_ROOT=...` flag.
 
-    NOTE: We **STRONGLY recommended AGAINST use** of the system libclang instead
+    NOTE: We **STRONGLY recommend AGAINST use** of the system libclang instead
     of the upstream compiled binaries. Random things may break. Save yourself
     the hassle and use the upstream pre-built libclang.
 
     You could also force the use of a custom libclang library with
     `-DEXTERNAL_LIBCLANG_PATH=/path/to/libclang.so` flag (the library would end
     with `.dylib` on a Mac). Again, this flag would be used _instead of_ the
-    other flags.
+    other flags. **If you compiled LLVM from source, this is the flag you should
+    be using.**
 
     Running the `make` command will also place the `libclang.[so|dylib]` in the
     `YouCompleteMe/third_party/ycmd` folder for you if you compiled with clang
@@ -417,7 +426,7 @@ User Guide
   through the completions. Use Shift-TAB to cycle backwards. Note that if you're
   using console Vim (that is, not Gvim or MacVim) then it's likely that the
   Shift-TAB binding will not work because the console will not pass it to Vim.
-  You can remap the keys; see the _Options_ section below.
+  You can remap the keys; see the _[Options][]_ section below.
 
 Knowing a little bit about how YCM works internally will prevent confusion. YCM
 has several completion engines: an identifier-based completer that collects all
@@ -492,6 +501,8 @@ see the above linked example file. You can get CMake to generate this file for
 you by adding `set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )` to your project's
 `CMakeLists.txt` file (if using CMake). If you're not using CMake, you could use
 something like [Bear][] to generate the `compile_commands.json` file.
+
+Consider using [YCM-Generator][ygen] to generate the `ycm_extra_conf.py` file.
 
 If Clang encounters errors when compiling the header files that your file
 includes, then it's probably going to take a long time to get completions.  When
@@ -776,6 +787,68 @@ of course).
 
 This command clears that cache entirely. YCM will then re-query your
 `FlagsForFile` function as needed in the future.
+
+Supported in filetypes: `c, cpp, objc, objcpp`
+
+### The `GetType` subcommand
+
+Echos the type of the variable or method under the cursor, and where it differs,
+the derived type.
+
+For example:
+
+```c++
+    std::string s;
+```
+
+Invoking this command on `s` returns `std::string => std::basic_string<char>`
+
+NOTE: Due to limitations of `libclang`, invoking this command on the word
+`auto` typically returns `auto`. However, invoking it on a usage of the variable
+with inferred type returns the correct type, but typically it is repeated due to
+`libclang` returning that the types differ.
+
+For example:
+
+```c++
+const char *s = "String";
+auto x = &s; // invoking on x or auto returns "auto";
+             // invoking on s returns "const char *"
+std::cout << *x; // invoking on x returns "const char ** => const char **"
+```
+
+NOTE: Causes reparsing of the current translation unit.
+
+Supported in filetypes: `c, cpp, objc, objcpp`
+
+### The `GetParent` subcommand
+
+Echos the semantic parent of the point under the cursor.
+
+The semantic parent is the item that semantically contains the given position.
+
+For example:
+
+```c++
+class C {
+    void f();
+};
+
+void C::f() {
+
+}
+```
+
+In the out-of-line definition of `C::f`, the semantic parent is the class `C`,
+of which this function is a member.
+
+In the example above, both declarations of `C::f` have `C` as their semantic
+context, while the lexical context of the first `C::f` is `C` and the lexical
+context of the second `C::f` is the translation unit.
+
+For global declarations, the semantic parent is the translation unit.
+
+NOTE: Causes reparsing of the current translation unit.
 
 Supported in filetypes: `c, cpp, objc, objcpp`
 
@@ -1266,6 +1339,16 @@ Default: `1`
 
     let g:ycm_auto_stop_csharp_server = 1
 
+### The `g:ycm_csharp_server_port` option
+
+When g:ycm_auto_start_csharp_server is set to `1`, specifies the port for
+the OmniSharp server to listen on. When set to `0` uses an unused port provided
+by the OS.
+
+Default: `0`
+
+    let g:ycm_csharp_server_port = 0
+
 ### The `g:ycm_add_preview_to_completeopt` option
 
 When this option is set to `1`, YCM will add the `preview` string to Vim's
@@ -1491,7 +1574,7 @@ Default: `[see next line]`
 
 Some omnicompletion engines do not work well with the YCM cache—in particular,
 they might not produce all possible results for a given prefix. By unsetting
-this option you can ensure that the omnicompletion engine is requeried on every
+this option you can ensure that the omnicompletion engine is re-queried on every
 keypress. That will ensure all completions will be presented, but might cause
 stuttering and lagginess if the omnifunc is slow.
 
@@ -1512,7 +1595,8 @@ Default: `1`
 
 Defines where `GoTo*` commands result should be opened.
 Can take one of the following values:
-`[ 'same-buffer', 'horizontal-split', 'vertical-split', 'new-tab' ]`
+`[ 'same-buffer', 'horizontal-split', 'vertical-split', 'new-tab',
+  'new-or-existing-tab' ]`
 If this option is set to the `'same-buffer'` but current buffer can not
 be switched (when buffer is modified and `nohidden` option is set),
 then result will be opened in horizontal split.
@@ -1524,7 +1608,7 @@ Default: `'same-buffer'`
 ### The `g:ycm_disable_for_files_larger_than_kb` option
 
 Defines the max size (in Kb) for a file to be considered for completion. If this
-option is set to 0 then no check is made on the size of the file you're opening
+option is set to 0 then no check is made on the size of the file you're opening.
 
 Default: 1000
 
@@ -1860,12 +1944,15 @@ cases; if we find the request to be reasonable, we'll find a way to address it.
 
 ### Completion doesn't work with the C++ standard library headers
 
-This is caused by an issue with libclang. Compiling from `clang` the binary uses
-the correct default header search paths but compiling from `libclang.so` does
-not. The issue seems to impact some OS's more than others. It appears that OS X
-Mavericks in particular has problems with this.
+This is caused by an issue with libclang that only affects some operating
+systems. Compiling with `clang` the binary will use the correct default header
+search paths but compiling with `libclang.so` (which YCM uses) does not.
 
-The current workaround is to call `echo | clang -v -E -x c++ -` and look at the
+Mac OS X is normally affected, but there's a workaround in YCM for that specific
+OS. If you're not running that OS but still have the same problem, continue
+reading.
+
+The workaround is to call `echo | clang -v -E -x c++ -` and look at the
 paths under the `#include <...> search starts here:` heading. You should take
 those paths, prepend `-isystem` to each individual path and append them all to
 the list of flags you return from your `FlagsForFile` function in your
@@ -1939,3 +2026,5 @@ This software is licensed under the [GPL v3 license][gpl].
 [status-mes]: https://groups.google.com/forum/#!topic/vim_dev/WeBBjkXE8H8
 [python-re]: https://docs.python.org/2/library/re.html#regular-expression-syntax
 [bear]: https://github.com/rizsotto/Bear
+[Options]: https://github.com/Valloric/YouCompleteMe#options
+[ygen]: https://github.com/rdnetto/YCM-Generator
