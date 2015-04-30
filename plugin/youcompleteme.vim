@@ -33,7 +33,7 @@ elseif v:version < 703 || (v:version == 703 && !has('patch584'))
         \ echohl None
   call s:restore_cpo()
   finish
-elseif !has( 'python' )
+elseif !exists( 'g:ycm_path_to_python_interpreter') && !has( 'python' )
   echohl WarningMsg |
         \ echomsg "YouCompleteMe unavailable: requires Vim compiled with " .
         \ "Python 2.x support" |
