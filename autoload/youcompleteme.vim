@@ -692,6 +692,9 @@ function! s:InvokeCompletion()
 endfunction
 
 
+let s:defined_GetCompletionsInner = 0
+function! s:define_GetCompletionsInner()
+  let s:defined_GetCompletionsInner = 1
 python << EOF
 def GetCompletionsInner():
   request = ycm_state.GetCurrentCompletionRequest()
@@ -717,9 +720,13 @@ def GetCompletionsInner():
 
   return { 'words' : results, 'refresh' : 'always' }
 EOF
+endfunction
 
 
 function! s:GetCompletions()
+  if !s:defined_GetCompletionsInner
+    call s:define_GetCompletionsInner()
+  endif
   py results = GetCompletionsInner()
   let results = pyeval( 'results' )
   return results
