@@ -40,12 +40,6 @@ let s:diagnostic_ui_filetypes = {
 function! youcompleteme#Enable()
   call s:SetUpBackwardsCompatibility()
 
-  " This can be 0 if YCM libs are old or -1 if an exception occured while
-  " executing the function.
-  if s:SetUpPython() != 1
-    return
-  endif
-
   call s:SetUpCpoptions()
   call s:SetUpCompleteopt()
   call s:SetUpKeyMappings()
@@ -104,7 +98,9 @@ function! youcompleteme#DisableCursorMovedAutocommands()
 endfunction
 
 
+let s:called_SetUpPython = 0
 function! s:SetUpPython() abort
+  let s:called_SetUpPython = 1
   py import sys
   py import vim
   exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
@@ -282,6 +278,30 @@ function! s:DiagnosticUiSupportedForCurrentFiletype()
 endfunction
 
 
+" Handle filetype defaults here, to avoid loading the Python interpreter.
+" The defaults are defined in third_party/ycmd/ycmd/default_settings.json.
+if !exists( 'g:filetype_whitelist')
+  let g:ycm_filetype_whitelist = {
+        \ "*": 1
+        \ }
+endif
+
+if !exists( 'g:filetype_blacklist')
+  let g:filetype_blacklist = {
+        \ "tagbar": 1,
+        \ "qf": 1,
+        \ "notes": 1,
+        \ "markdown": 1,
+        \ "unite": 1,
+        \ "text": 1,
+        \ "vimwiki": 1,
+        \ "pandoc": 1,
+        \ "infolog": 1,
+        \ "mail": 1
+        \ }
+endif
+
+
 function! s:AllowedToCompleteInCurrentFile()
   if empty( &filetype ) ||
         \ getbufvar( winbufnr( winnr() ), "&buftype" ) ==# 'nofile' ||
@@ -315,7 +335,11 @@ function! s:AllowedToCompleteInCurrentFile()
     endif
   endfor
 
-  return whitelist_allows && blacklist_allows
+  let allowed = whitelist_allows && blacklist_allows
+  if allowed && !s:called_SetUpPython
+    call s:SetUpPython()
+  endif
+  return allowed
 endfunction
 
 
@@ -326,7 +350,7 @@ function! s:SetUpCpoptions()
 
   " This prevents the display of "Pattern not found" & similar messages during
   " completion. This is only available since Vim 7.4.314
-  if pyeval( 'vimsupport.VimVersionAtLeast("7.4.314")' )
+  if has("patch-7.4.314")
     set shortmess+=c
   endif
 endfunction
@@ -668,6 +692,9 @@ function! s:InvokeCompletion()
 endfunction
 
 
+let s:defined_GetCompletionsInner = 0
+function! s:define_GetCompletionsInner()
+  let s:defined_GetCompletionsInner = 1
 python << EOF
 def GetCompletionsInner():
   request = ycm_state.GetCurrentCompletionRequest()
@@ -693,9 +720,13 @@ def GetCompletionsInner():
 
   return { 'words' : results, 'refresh' : 'always' }
 EOF
+endfunction
 
 
 function! s:GetCompletions()
+  if !s:defined_GetCompletionsInner
+    call s:define_GetCompletionsInner()
+  endif
   py results = GetCompletionsInner()
   let results = pyeval( 'results' )
   return results

@@ -61,6 +61,11 @@ def TextAfterCursor():
 
 
 # Expects version_string in 'MAJOR.MINOR.PATCH' format, e.g. '7.4.301'
+#
+# This was used in autoload/youcompleteme.vim, but should be avoided, because
+# it loads the Python interpreter (in Neovim). Also, why use Python when
+# VimL will do just fine? It now uses as try-catch for the feature detection,
+# which is considered to be better anyway.
 def VimVersionAtLeast( version_string ):
   major, minor, patch = [ int( x ) for x in version_string.split( '.' ) ]
 

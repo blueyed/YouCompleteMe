@@ -6,6 +6,8 @@ YouCompleteMe: a code-completion engine for Vim
 This is a fork of [https://github.com/Valloric/YouCompleteMe](YouCompleteMe),
 with the following notable changes:
 
+- Do not load the Python host provider in Neovim, until Python is actually
+  needed.
 - Do not replace signs from other Vim plugins
   (https://github.com/Valloric/YouCompleteMe/issues/812,
   https://github.com/Valloric/YouCompleteMe/issues/887)
