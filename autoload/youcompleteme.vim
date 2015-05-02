@@ -98,9 +98,21 @@ function! youcompleteme#DisableCursorMovedAutocommands()
 endfunction
 
 
-let s:called_SetUpPython = 0
+function! s:python_OK()
+  if exists('s:python_is_OK')
+    return s:python_is_OK
+  endif
+
+  if !has('python')
+    let s:python_is_OK = 0
+  else
+    let s:python_is_OK = s:SetUpPython()
+  endif
+  return s:python_is_OK
+endfunction
+
+
 function! s:SetUpPython() abort
-  let s:called_SetUpPython = 1
   py import sys
   py import vim
   exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
@@ -336,8 +348,8 @@ function! s:AllowedToCompleteInCurrentFile()
   endfor
 
   let allowed = whitelist_allows && blacklist_allows
-  if allowed && !s:called_SetUpPython
-    call s:SetUpPython()
+  if allowed && !s:python_OK()
+    return 0
   endif
   return allowed
 endfunction
