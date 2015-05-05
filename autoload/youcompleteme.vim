@@ -848,6 +848,7 @@ function! s:CompleterCommand(...)
     let arguments = arguments[1:]
   endif
 
+  call s:python_OK()
   py ycm_state.SendCommandRequest( vim.eval( 'l:arguments' ),
         \                          vim.eval( 'l:completer' ) )
 endfunction
