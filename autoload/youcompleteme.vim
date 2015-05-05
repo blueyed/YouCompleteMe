@@ -292,14 +292,14 @@ endfunction
 
 " Handle filetype defaults here, to avoid loading the Python interpreter.
 " The defaults are defined in third_party/ycmd/ycmd/default_settings.json.
-if !exists( 'g:filetype_whitelist')
+if !exists( 'g:ycm_filetype_whitelist' )
   let g:ycm_filetype_whitelist = {
         \ "*": 1
         \ }
 endif
 
-if !exists( 'g:filetype_blacklist')
-  let g:filetype_blacklist = {
+if !exists( 'g:ycm_filetype_blacklist' )
+  let g:ycm_filetype_blacklist = {
         \ "tagbar": 1,
         \ "qf": 1,
         \ "notes": 1,
