@@ -112,6 +112,7 @@ function! s:python_OK()
 endfunction
 
 
+let s:done_python_setup = 0
 function! s:SetUpPython() abort
   py import sys
   py import vim
@@ -147,6 +148,7 @@ except RuntimeError as e:
     vim.command('return 0')
 EOF
 
+  let s:done_python_setup = 1
   return 1
 endfunction
 
@@ -405,7 +407,9 @@ endfunction
 
 
 function! s:OnVimLeave()
-  py ycm_state.OnVimLeave()
+  if s:done_python_setup
+    py ycm_state.OnVimLeave()
+  endif
 endfunction
 
 
@@ -812,6 +816,10 @@ command! YcmShowDetailedDiagnostic call s:ShowDetailedDiagnostic()
 
 
 function! s:DebugInfo()
+  if !s:python_OK()
+    echom "YouCompleteMe: there was a problem setting up Python."
+  endif
+
   echom "Printing YouCompleteMe debug information..."
   let debug_info = pyeval( 'ycm_state.DebugInfo()' )
   for line in split( debug_info, "\n" )
@@ -859,12 +867,14 @@ command! -nargs=* -complete=custom,youcompleteme#SubCommandsComplete
   \ YcmCompleter call s:CompleterCommand(<f-args>)
 
 function! youcompleteme#SubCommandsComplete( arglead, cmdline, cursorpos )
+  call s:python_OK()
   return join( pyeval( 'ycm_state.GetDefinedSubcommands()' ),
     \ "\n")
 endfunction
 
 
 function! s:ForceCompile()
+  call s:python_OK()
   if !pyeval( 'ycm_state.NativeFiletypeCompletionUsable()' )
     echom "Native filetype completion not supported for current file, "
           \ . "cannot force recompilation."
