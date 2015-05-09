@@ -782,6 +782,7 @@ endfunction
 
 
 function! youcompleteme#OmniComplete( findstart, base )
+  call s:python_OK()
   if a:findstart
     if !pyeval( 'ycm_state.IsServerAlive()' )
       return -2
@@ -797,11 +798,13 @@ endfunction
 
 
 function! youcompleteme#ServerPid()
+  call s:python_OK()
   return pyeval( 'ycm_state.ServerPid()' )
 endfunction
 
 
 function! s:RestartServer()
+  call s:python_OK()
   py ycm_state.RestartServer()
 endfunction
 
@@ -809,6 +812,7 @@ command! YcmRestartServer call s:RestartServer()
 
 
 function! s:ShowDetailedDiagnostic()
+  call s:python_OK()
   py ycm_state.ShowDetailedDiagnostic()
 endfunction
 
